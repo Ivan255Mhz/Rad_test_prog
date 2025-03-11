@@ -19,7 +19,7 @@ class MainWindow : public QWidget {
     QSpinBox *spinRed1, *spinBlue1, *spinRed2, *spinBlue2;
     QPushButton *btnApply;
     QPushButton *btnVisualize;
-    QTextEdit *logTextEdit;
+    QPlainTextEdit *logTextEdit;
 
     VisualizationWindow *visWindow;
 

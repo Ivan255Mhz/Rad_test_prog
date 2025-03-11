@@ -115,11 +115,10 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent)
     settingsLayout->addWidget(btnApply);
     settingsGroup->setLayout(settingsLayout);
 
-    logTextEdit = new QTextEdit;
+    logTextEdit = new QPlainTextEdit;
     logTextEdit->setReadOnly(true);
-    logTextEdit->setFixedHeight(150);
-    mainLayout->addWidget(logTextEdit);
-
+    logTextEdit->setMaximumBlockCount(3);
+    logTextEdit->setFixedHeight(60);
 
     mainLayout->addWidget(group1);
     mainLayout->addWidget(group2);
@@ -296,10 +295,19 @@ void MainWindow::onMove2to1() {
 }
 
 void MainWindow::logAction(const QString &message) {
-    logTextEdit->append(message);
+    QString timestamp = QDateTime::currentDateTime().toString("HH:mm:ss");
+    QString fullMessage = QString("[%1] %2").arg(timestamp, message);
+
+    while (logTextEdit->document()->blockCount() > 3) {
+        QTextCursor cursor(logTextEdit->document());
+        cursor.movePosition(QTextCursor::Start);
+        cursor.select(QTextCursor::BlockUnderCursor);
+        cursor.removeSelectedText();
+        cursor.deleteChar();
+    }
+
+    logTextEdit->appendPlainText(fullMessage);
 }
-
-
 
 void MainWindow::onDrawTwo() {
     bool canTwoFrom1 = basket1.total() >= 2;
