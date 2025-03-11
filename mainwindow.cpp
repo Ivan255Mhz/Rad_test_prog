@@ -13,13 +13,13 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
     QPixmap background(":/img/blc.jpg");
-    // Масштабируем изображение под размер окна
+
     QPixmap scaledBackground = background.scaled(this->size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-    // Рисуем фон
+
     painter.drawPixmap(0, 0, scaledBackground);
 
-    // Вызываем базовый paintEvent для отрисовки остальных элементов
+
     QWidget::paintEvent(event);
 }
 
@@ -115,12 +115,18 @@ MainWindow::MainWindow(int argc, char *argv[], QWidget *parent)
     settingsLayout->addWidget(btnApply);
     settingsGroup->setLayout(settingsLayout);
 
-    // Сборка интерфейса
+    logTextEdit = new QTextEdit;
+    logTextEdit->setReadOnly(true);
+    logTextEdit->setFixedHeight(150);
+    mainLayout->addWidget(logTextEdit);
+
+
     mainLayout->addWidget(group1);
     mainLayout->addWidget(group2);
     mainLayout->addLayout(buttonsLayout);
     mainLayout->addWidget(groupTwo);
     mainLayout->addWidget(settingsGroup);
+    mainLayout->addWidget(logTextEdit);
 
     // Подключение сигналов
     connect(btnMove1to2, &QPushButton::clicked, this, &MainWindow::onMove1to2);
@@ -143,6 +149,7 @@ void MainWindow::initializeBaskets(int argc, char *argv[]) {
         if (ok && r2 >= 0) initialRed2 = r2;
         int b2 = QString(argv[4]).toInt(&ok);
         if (ok && b2 >= 0) initialBlue2 = b2;
+        logAction("Корзины инициализированы через командную строку");
     }
 
     basket1 = Basket(initialRed1, initialBlue1);
@@ -238,6 +245,7 @@ void MainWindow::updateUI() {
 void MainWindow::applyValues() {
     basket1 = Basket(spinRed1->value(), spinBlue1->value());
     basket2 = Basket(spinRed2->value(), spinBlue2->value());
+    logAction("Настройки корзин обновлены через интерфейс");
     updateUI();
 }
 
@@ -256,6 +264,7 @@ void MainWindow::onMove1to2() {
     }
 
     bool isRed = QRandomGenerator::global()->bounded(basket1.total()) < basket1.GetRed();
+    QString color = isRed ? "красный" : "синий";
     if (isRed) {
         basket1.removeRed(1);
         basket2.addRed(1);
@@ -263,6 +272,7 @@ void MainWindow::onMove1to2() {
         basket1.removeBlue(1);
         basket2.addBlue(1);
     }
+    logAction(QString("Перемещен %1 шар из корзины 1 в корзину 2").arg(color));
     updateUI();
 }
 
@@ -273,6 +283,7 @@ void MainWindow::onMove2to1() {
     }
 
     bool isRed = QRandomGenerator::global()->bounded(basket2.total()) < basket2.GetRed();
+    QString color = isRed ? "красный" : "синий";
     if (isRed) {
         basket2.removeRed(1);
         basket1.addRed(1);
@@ -280,8 +291,15 @@ void MainWindow::onMove2to1() {
         basket2.removeBlue(1);
         basket1.addBlue(1);
     }
+    logAction(QString("Перемещен %1 шар из корзины 2 в корзину 1").arg(color));
     updateUI();
 }
+
+void MainWindow::logAction(const QString &message) {
+    logTextEdit->append(message);
+}
+
+
 
 void MainWindow::onDrawTwo() {
     bool canTwoFrom1 = basket1.total() >= 2;
@@ -314,6 +332,9 @@ void MainWindow::onDrawTwo() {
         int remainingRed = r - redCount;
         int remainingBlue = b - blueCount;
         bool secondRed = QRandomGenerator::global()->bounded(remainingTotal) < remainingRed;
+        QString firstColor = firstRed ? "красный" : "синий";
+        QString secondColor = secondRed ? "красный" : "синий";
+        logAction(QString("Извлечено из корзины 1: %1 и %2 шары").arg(firstColor, secondColor));
         redCount += secondRed ? 1 : 0;
         blueCount += secondRed ? 0 : 1;
 
@@ -333,6 +354,11 @@ void MainWindow::onDrawTwo() {
         int remainingRed = r - redCount;
         int remainingBlue = b - blueCount;
         bool secondRed = QRandomGenerator::global()->bounded(remainingTotal) < remainingRed;
+        QString firstColor = firstRed ? "красный" : "синий";
+        QString secondColor = secondRed ? "красный" : "синий";
+
+        logAction(QString("Извлечено из корзины 2: %1 и %2 шары").arg(firstColor, secondColor));
+
         redCount += secondRed ? 1 : 0;
         blueCount += secondRed ? 0 : 1;
 
@@ -345,6 +371,10 @@ void MainWindow::onDrawTwo() {
         basket1.removeBlue(!red1 ? 1 : 0);
 
         bool red2 = QRandomGenerator::global()->bounded(basket2.total()) < basket2.GetRed();
+        QString color1 = red1 ? "красный" : "синий";
+        QString color2 = red2 ? "красный" : "синий";
+
+        logAction(QString("Извлечено: %1 из корзины 1 и %2 из корзины 2").arg(color1, color2));
         basket2.removeRed(red2 ? 1 : 0);
         basket2.removeBlue(!red2 ? 1 : 0);
     }

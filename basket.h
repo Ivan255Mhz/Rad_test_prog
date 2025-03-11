@@ -10,9 +10,15 @@ class Basket {
 public:
     Basket(int r = 0, int b = 0) : Red(r), Blue(b) {}
 
-    int GetRed() const { return Red; }
-    int GetBlue() const { return Blue; }
-    int total() const { return Red + Blue; }
+    int GetRed() const{
+        return Red;
+    }
+    int GetBlue() const{
+        return Blue;
+    }
+    int total() const{
+        return Red + Blue;
+    }
 
     double getRedProbability() const {
         return total() > 0 ? static_cast<double>(Red) / total() : 0.0;

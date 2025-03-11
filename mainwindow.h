@@ -18,7 +18,8 @@ class MainWindow : public QWidget {
     QPushButton *btnMove1to2, *btnMove2to1, *btnDrawTwo;
     QSpinBox *spinRed1, *spinBlue1, *spinRed2, *spinBlue2;
     QPushButton *btnApply;
-    QPushButton *btnVisualize; // Новая кнопка
+    QPushButton *btnVisualize;
+    QTextEdit *logTextEdit;
 
     VisualizationWindow *visWindow;
 
@@ -27,6 +28,9 @@ class MainWindow : public QWidget {
 
     void initializeBaskets(int argc, char *argv[]);
     void updateUI();
+    void logAction(const QString &message);
+
+
 protected:
     void paintEvent(QPaintEvent *event) override;
 
@@ -39,7 +43,7 @@ private slots:
     void onMove2to1();
     void onDrawTwo();
     void applyValues();
-    void showVisualization(); // Новый слот
+    void showVisualization();
 };
 
 #endif // MAINWINDOW_H
